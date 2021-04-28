@@ -21,7 +21,10 @@ class Solver:
     #  with a given part-of-speech labeling. Right now just returns -999 -- fix this!
     def posterior(self, model, sentence, label):
         if model == "Simple":
-            return -999
+            ans = 0
+            for word, pos in zip(sentence, label):
+                ans += math.log((self.p_words[word][pos]/self.p_pos[pos])*(self.p_pos[pos]/self.total_pos)*(self.total_words/self.p_words[word]['total_count']))
+            return ans
         elif model == "HMM":
             return -999
         elif model == "Complex":
@@ -51,6 +54,10 @@ class Solver:
                     # self.p_words[word]['total_count'] = 1
                 else:
                     self.p_words[word]['total_count'] += 1
+                    if tag not in self.p_pos:
+                        self.p_pos[tag] = 1
+                    else:
+                        self.p_pos[tag]+=1
                     if tag not in self.p_words[word].keys():
                         self.p_words[word][tag] = 1
                     else:

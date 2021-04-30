@@ -47,7 +47,7 @@ class Solver:
                         else:
                             prob_pos_word = self.p_words[word][pos] / self.p_pos[pos]
 
-                ans += math.log((prob_pos_word)*(prob_pos)*(1/prob_word))
+                ans += math.log(prob_pos_word) + math.log(prob_pos)-math.log(prob_word)
             return ans
         elif model == "HMM":
             ans = 0

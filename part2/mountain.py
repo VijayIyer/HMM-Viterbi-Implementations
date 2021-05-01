@@ -55,7 +55,11 @@ imageio.imwrite('edges.jpg', uint8(255 * edge_strength / (amax(edge_strength))))
 
 # You'll need to add code here to figure out the results! For now,
 # just create a horizontal centered line.
-
+input_image_hmm = input_image.copy()
+input_image_known = input_image.copy()
+outputimage_name1 = '_Simple'+input_filename
+outputimage_name2 = '_HMM'+input_filename
+outputimage_name3 = '_Known'+input_filename
 # naive bayes
 ridge1 = []
 # ridge = [edge_strength.shape[0]/2] * edge_strength.shape[1]
@@ -66,45 +70,43 @@ for col in range(edge_strength.shape[1]):
     ridge1.append(max_loc)
 # naive bayes
 # output answer
-imageio.imwrite("output_mountain_naivebayes.jpg", draw_edge(input_image, ridge1, (255, 0, 0), 5))
+imageio.imwrite(outputimage_name1, draw_edge(input_image, ridge1, (255, 0, 0), 5))
+input_image.close()
 ridge2 = []
 # hmm viterbi no co-ord
 init_prob = [edge_strength[loc][0]/sum([i for i in edge_strength[1]]) for loc in range(edge_strength.shape[0])]
-# transposed_edge = np.transpose(edge_strength)
 
-# for row in range(edge_strength.shape[0]):
-#     for col in range(edge_strength.shape[1]-1):
-#         # normalize_col = sum([i for i in edge_strength[col]])
-#
-#         trans_prob[row][col] =
-#
-# trans_prob = np.transpose(trans_prob)
-#
-# for col in range(1, edge_strength.shape[1]):
-#     for row in range(edge_strength.shape[0]):
-#         if row-1>0 and row+1<edge_strength.shape[0]:
-#             trans_prob[row][col] = trans_prob[row][col]/(trans_prob[row-1][col]+trans_prob[row][col]+trans_prob[row+1][col])
-#         elif row-1 <=0:
-#             trans_prob[row][col] = trans_prob[row][col] / (trans_prob[row][col] + trans_prob[row + 1][col])
-#         else:
-#             trans_prob[row][col] = trans_prob[row][col] / (trans_prob[row-1][col] + trans_prob[row][col])
 trans_prob = zeros((edge_strength.shape[0],edge_strength.shape[0]))
 delta = [[0 for _ in range(edge_strength.shape[1])] for _ in range(edge_strength.shape[0])]
 paths = [[None for _ in range(edge_strength.shape[1])] for _ in range(edge_strength.shape[0])]
 for row in range(edge_strength.shape[0]):
     delta[row][0] = init_prob[row]
+normalized_row_tran = zeros((edge_strength.shape[0],edge_strength.shape[0]))
 for col in range(1, edge_strength.shape[1]):
+    transposed_edge = np.transpose(edge_strength)
+    for i, pixel1 in enumerate(transposed_edge[col-1]):
 
-    for pixel1 in range(edge_strength.shape[0]):
-        for pixel2 in range(edge_strength.shape[0]):
-            trans_prob[pixel1][pixel2] = (1/(1 + abs(pixel1-pixel2))) * (1/trans_prob.shape[0])
+        for j, pixel2 in enumerate(transposed_edge[col]):
+            if i +1 >= j >= i-1:
+                trans_prob[i][j] = 1
+            else:
+                trans_prob[i][j] = 1/abs(j - i)
+
+
+        normalized_row_tran = sum([k for k in trans_prob[i]])
+        for j, pixel2 in enumerate(transposed_edge[col]):
+            trans_prob[i][j] = trans_prob[i][j]/normalized_row_tran
 
     normalized_col = sum([edge_strength[j][col] for j in range(edge_strength.shape[0])])
     for pixel in range(edge_strength.shape[0]):
         emission_prob = edge_strength[pixel][col]/normalized_col
         delta[pixel][col] = max([delta[j][col-1]*trans_prob[j][pixel] for j in range(edge_strength.shape[0])])*emission_prob
         paths[pixel][col] = np.argmax([delta[j][col-1]*trans_prob[j][pixel] for j in range(edge_strength.shape[0])])
-final_path = np.argmax([delta[pos][edge_strength.shape[0]-1] for pos in range(edge_strength.shape[0])])
+    nomalized_delta = sum([delta[pixel][col] for pixel in range(len(delta))])
+    for pixel in range(len(delta)):
+        delta[pixel][col] = delta[pixel][col]/ nomalized_delta
+
+final_path = np.argmax([delta[pos][edge_strength.shape[1]-1] for pos in range(edge_strength.shape[0])])
 state_path = [final_path]
 # backtracking to get the paths
 for t in range(edge_strength.shape[1] - 1, 0, -1):
@@ -112,7 +114,51 @@ for t in range(edge_strength.shape[1] - 1, 0, -1):
     final_path = state_path[-1]
 ridge2 = state_path[::-1]
 
-imageio.imwrite("output_mountain_hmm.jpg", draw_edge(input_image, ridge2, (0, 0, 255), 5))
+imageio.imwrite(outputimage_name2, draw_edge(input_image_hmm, ridge2, (0, 0, 255), 5))
+input_image_hmm.close()
+
 
 # row co-ord
-imageio.imwrite("output_mountain_coord.jpg", draw_edge(input_image, ridge2, (0, 255, 0), 5))
+
+trans_prob = zeros((edge_strength.shape[0],edge_strength.shape[0]))
+delta = [[0 for _ in range(edge_strength.shape[1])] for _ in range(edge_strength.shape[0])]
+paths = [[None for _ in range(edge_strength.shape[1])] for _ in range(edge_strength.shape[0])]
+for row in range(edge_strength.shape[0]):
+    delta[row][0] = init_prob[row]
+normalized_row_tran = zeros((edge_strength.shape[0],edge_strength.shape[0]))
+for col in range(1, edge_strength.shape[1]):
+    transposed_edge = np.transpose(edge_strength)
+    for i, pixel1 in enumerate(transposed_edge[col - 1]):
+
+        for j, pixel2 in enumerate(transposed_edge[col]):
+            if col == int(gt_col) and j != int(gt_row):
+                trans_prob[i][j] = 0
+            else:
+                if i + 1 >= j >= i - 1:
+                    trans_prob[i][j] = 1
+                else:
+                    trans_prob[i][j] = 1 / abs(j - i)
+
+        normalized_row_tran = sum([k for k in trans_prob[i]])
+        for j, pixel2 in enumerate(transposed_edge[col]):
+            trans_prob[i][j] = trans_prob[i][j]/normalized_row_tran
+
+    normalized_col = sum([edge_strength[j][col] for j in range(edge_strength.shape[0])])
+    for pixel in range(edge_strength.shape[0]):
+        emission_prob = edge_strength[pixel][col] / normalized_col
+        delta[pixel][col] = max([delta[j][col - 1] * trans_prob[j][pixel] for j in range(edge_strength.shape[0])]) * emission_prob
+        paths[pixel][col] = np.argmax([delta[j][col - 1] * trans_prob[j][pixel] for j in range(edge_strength.shape[0])])
+    nomalized_delta = sum([delta[pixel][col] for pixel in range(len(delta))])
+    for pixel in range(len(delta)):
+        delta[pixel][col] = delta[pixel][col] / nomalized_delta
+final_path = np.argmax([delta[pos][edge_strength.shape[1]-1] for pos in range(edge_strength.shape[0])])
+state_path = [final_path]
+#region Backtracking to get back path from stored paths
+for t in range(edge_strength.shape[1] - 1, 0, -1):
+    state_path.append(paths[final_path][t])
+    final_path = state_path[-1]
+ridge2 = state_path[::-1]
+print(ridge2)
+imageio.imwrite(outputimage_name3, draw_edge(input_image_known, ridge2, (0, 255, 0), 5))
+
+#endregion

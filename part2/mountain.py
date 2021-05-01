@@ -158,7 +158,7 @@ for t in range(edge_strength.shape[1] - 1, 0, -1):
     state_path.append(paths[final_path][t])
     final_path = state_path[-1]
 ridge2 = state_path[::-1]
-print(ridge2)
+
 imageio.imwrite(outputimage_name3, draw_edge(input_image_known, ridge2, (0, 255, 0), 5))
 
 #endregion

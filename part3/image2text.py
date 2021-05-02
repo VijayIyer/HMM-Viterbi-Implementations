@@ -85,7 +85,7 @@ for pos1 in word_count.keys():
 #endregion
 #region Part1 Simple Bayes net
 actual_characters = []
-m = 0.7
+m = 0.85
 #build up probabilities of each pixel given the word
 prob_pixel_word = {k:[[0 for _ in range(len(train_letters[random.choice(list(train_letters))][0]))] for _ in range(len(train_letters[random.choice(list(train_letters))]))] for k in train_letters.keys()}  # hard-coded for now
 for letter, pixels in train_letters.items():
@@ -99,7 +99,7 @@ for letter, pixels in train_letters.items():
 prob_word_pixel = [{k:0 for k in train_letters.keys()} for _ in range(len(test_letters))]
 for ind, letter in enumerate(test_letters):
     for k in train_letters.keys():
-        for i,row in enumerate(letter[0]):
+        for i,row in enumerate(letter):
             for j,character in enumerate(row):
                 if character == '*':
                     prob_word_pixel[ind][k] += math.log(prob_pixel_word[k][i][j])
@@ -154,15 +154,16 @@ actual_characters_hmm = [list(word_count.keys())[state] for state in state_path]
 actual_characters_hmm = actual_characters_hmm[::-1]
 #endregion
 
+#region Commenting out existing code
 # Each training letter is now stored as a list of characters, where black
 #  dots are represented by *'s and white dots are spaces. For example,
 #  here's what "a" looks like:
-print("\n".join([ r for r in train_letters['a'] ]))
-
-# Same with test letters. Here's what the third letter of the test data
-#  looks like:
-print("\n".join([ r for r in test_letters[2] ]))
-
+# print("\n".join([ r for r in train_letters['a'] ]))
+#
+# # Same with test letters. Here's what the third letter of the test data
+# #  looks like:
+# print("\n".join([ r for r in test_letters[2] ]))
+#endregion
 
 
 # The final two lines of your output should look something like this:

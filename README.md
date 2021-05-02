@@ -14,7 +14,7 @@ For our computation, the components required are
     - Here the problem, is to identify the Parts of speech in sentences of the test corpus, after training on the brown corpus file given.
     - The **States here are the 12 parts of speech tags (Noun, Verb, Adv, Adj, DET, etc.....)** and the observations **(O)** are the words that are given to us in the test sentence. 
     - The transition probabilities are the probabilities of obtaining some State Qi,given the previous State Qj. 
-    - **Implementation** - 
+    - **Implementation** - I go over each training sentence just as for the simple bayes model. There are 2 dictionaries  - 1. **init_prob** dictionary holding the initial probability of a sentence starting with a given POS tag. For this, I increment the value of the dictionary key which occurs as the first tag in the training sentence. 2. **trans_prob** - a dictionary of dictionaries, with rows and columns both as pos tags. In this case, since there are 12 POS, our matrix is of size 12 by 12. I go over each word with its POS in training text, and then consider the next word to increment trans_prob[pos1][pos2] by 1 which signifies the transition of POS tag1 to POS tag2. The **emission probability** of a word is just the dictionary calculated in the previous Simple Bayes model **word_pos[word]|[pos]**. 
 
 ## Problem 2 - Mountain Finding - 
 

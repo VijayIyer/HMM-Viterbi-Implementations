@@ -10,7 +10,7 @@ For our computation, the components required are
   - **Challenges** - 
    - For **unknown words**, I assigned a probability of *1/count of pos* for **word_pos[word][pos]**. With words there are 2 types of edge cases, 1. when a word itself was never encountered, 2. when a word was never encountered with the particular POS.
    - **Comments and results** - For the test file, bc.test with 200 test sentences, I obtain an accuracy of ***91.76%*** for words correct and ***37.75%*** for number of sentences correct. Since the simple bayes net considers, all states independent given the word, the answer is influenced by count of the POS for the given word. 
-**Viterbi Algorithm**
+**Viterbi Algorithm** - 
     - Here the problem, is to identify the Parts of speech in sentences of the test corpus, after training on the brown corpus file given.
     - The **States here are the 12 parts of speech tags (Noun, Verb, Adv, Adj, DET, etc.....)** and the observations **(O)** are the words that are given to us in the test sentence. 
     - The transition probabilities are the probabilities of obtaining some State Qi,given the previous State Qj. 

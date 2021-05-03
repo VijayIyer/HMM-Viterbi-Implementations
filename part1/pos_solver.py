@@ -85,7 +85,20 @@ class Solver:
 
             return ans
         elif model == "Complex":
-            return -999
+            ans = 0
+            # emission_prob = [0 for _ in range(len(sentence))]
+            for i in range(len(sentence)):
+                if sentence[i] not in self.p_words.keys():
+                    ans = -math.log(self.total_words)
+                else:
+                    if label[i] not in self.p_words[sentence[i]].keys():
+                        ans = -math.log(self.p_pos[label[i]])
+                    else:
+                        if i == 0:
+                            ans += math.log(self.init_prob[label[i]])
+                        else:
+                            ans += math.log(self.pos_word_pos1_pos2[sentence[i]][(label[i-1],label[i])]) + math.log(self.trans_prob[label[i-1]][label[i]])
+            return ans
         else:
             print("Unknown algo!")
 

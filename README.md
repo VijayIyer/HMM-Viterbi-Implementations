@@ -43,6 +43,7 @@ I have used the same approach as in Viterbi Algorithm for problem 1 and 3
  
  - For the simple bayes net I am just taking the pixel location with the maximum gradient value. However, the better choice would be some function which penalizes variance of gradient strengh above the pxiel location - this however didnt work in practice, and the pixel being picked is still the one with highest gradient strength irrespective of above values
  - **Results and Challenges** - The emission probabilites were hard to decide, and none of the functions I decided were able to pick the right location when some other location had higher gradient strength. Even with known co-ordinates, The ridgeline is not getting updated at most times, only few pixels around the point are being shaded with the values. I wanted to use Log of the probabilities instead of product, but 0 values were coming. 
+  - I am committing a folder with output images - **test_images_output**. Also, the code is such that output images are saved to this folder. 
  
 
 ## Problem 3 - Image to Text - 
